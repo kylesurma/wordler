@@ -1,15 +1,17 @@
 import { LitElement, html, css } from 'lit';
+import { initGame } from './util'
 import startNewGame from './NewGame';
 import './game-board';
 import './wordler-keyboard';
-import './wordler-title'
-import './game-modal'
-
+import './wordler-title';
+import './game-modal';
 
 export class WordlerApp extends LitElement {
   static properties = {
     game: { type: Object, state: true },
-    currentGuess: {type: Array, state: true}
+    currentGuess: { type: Array, state: true },
+    isNotWord: { type: Boolean, state: true },
+    currentGuessStr: { type: String }
   };
 
   static styles = css`
@@ -28,7 +30,7 @@ export class WordlerApp extends LitElement {
 
     .tile {
       box-shadow: 1px 0px 5px 2px rgba(0, 0, 0, 0.2);
-      background-color: #FFFFFB;
+      background-color: #fffffb;
       border-radius: 4px;
       padding: 20px;
     }
@@ -51,30 +53,41 @@ export class WordlerApp extends LitElement {
     super();
     this.game = {
       guessArchive: [],
-      keysPlayed: {}
-    }
+      keysPlayed: {},
+    };
     this.currentGuess = [];
+    this.currentGuessStr = ''
+    this.isNotWord = false
   }
 
   firstUpdated() {
-    this.newGame()
+    this.newGame();
   }
 
-  willUpdate(changedProps) {
-  }
+  willUpdate(changedProps) {}
 
   render() {
+    const { guessArchive, keysPlayed, isWon, isLose, word, definitions } =
+      this.game;
 
-    const { guessArchive, keysPlayed, isWon, isLose, word } = this.game
-    
+      
+
     return html`
-    <wordler-title></wordler-title>
+      <wordler-title></wordler-title>
       <div class="tile">
-      <game-modal .word=${word} .isWin=${isWon} .isLose=${isLose}></game-modal>
-        <div class="game-container">
+        <game-modal
+          .word=${word || ''}
+          .definitions=${definitions || []}
+          .isWin=${isWon}
+          .isLose=${isLose}
+          @startNewGame=${this._handleStart}
+          ></game-modal>
+          <div class="game-container">
           <game-board
-            .guesses=${guessArchive}
-            .currentGuess=${this.currentGuess}
+          .guesses=${guessArchive}
+          .currentGuess=${this.currentGuess}
+          .currentGuessStr=${this.currentGuessStr}
+            .isNotWord=${this.isNotWord}
           ></game-board>
           <wordler-keyboard
             .keysPlayed=${keysPlayed}
@@ -84,18 +97,28 @@ export class WordlerApp extends LitElement {
       </div>
     `;
   }
-  
+
   async makeGuess(guess) {
-    const isWord =  await this.game.submitGuess(guess, this);
+    const currentGuess = guess
+    this.currentGuessStr = guess.join('')
+    this.isNotWord = false
+    const isWord = await this.game.submitGuess(guess, this);
     if (!isWord) {
-      this.displayNotAWord = true
+      this.isNotWord = true
     }
-    this.currentGuess = []
+    this.currentGuess = [];
   }
-  
+
+  _handleStart() {
+    this.game = initGame
+    this.newGame()
+  }
+
   async newGame() {
-    const newGame = await startNewGame()
-    this.game = newGame
+    
+    const newGame = await startNewGame();
+    this.game = newGame;
+    this.requestUpdate()
   }
   
   _handlePressedKey(e) {

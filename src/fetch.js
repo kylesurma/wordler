@@ -1,7 +1,7 @@
 export const getWord = async () => {
   const response = await fetch('./api/new-word/', { method: 'GET' });
-  const data = await response.json();
-  return data.word;
+  const { word , definitions } = await response.json();
+  return { word , definitions };
 };
 
 export const fetchIsWord = async word => {

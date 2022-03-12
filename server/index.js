@@ -1,6 +1,8 @@
 const axios = require('axios');
 const router = require('express').Router();
 
+const { getWord, checkWord } = require('./util')
+
 const options = {
   method: 'GET',
   headers: {
@@ -11,12 +13,8 @@ const options = {
 
 router.get('/new-word', async (req, res, next) => {
   try {
-    const { data } = await axios.get(
-      `https://wordsapiv1.p.rapidapi.com/words/?random=true&letters=5&lettersmin=5`,
-      options
-    );
-
-    res.send({ word: data.word });
+   const data = await getWord()
+   if (data) res.send(data);
   } catch (err) {
     next(err);
   }
@@ -25,12 +23,10 @@ router.get('/new-word', async (req, res, next) => {
 router.post('/check-word', async (req, res, next) => {
   const { word } = req.body
   try {
-    const { data } = await axios.get(
-      `https://wordsapiv1.p.rapidapi.com/words/${word}/definitions`,
-      options
-    );
+  
+  const definitions = await checkWord(word)
 
-    res.send({ isWord: data.definitions });
+    res.send({ isWord: definitions });
   } catch (error) {
     res.status(200).send({ isWord: false });
   }

@@ -3,12 +3,15 @@ import { isWinner } from './util.js';
 import { getWord, fetchIsWord } from './fetch.js';
 
 const startNewGame = async (letterCount = 5) => {
-  const gotWord = await getWord(letterCount);
+  const { word , definitions } = await getWord(letterCount);
 
   class NewGame {
-    constructor(word) {
-      this.word = word;
+
+
+    constructor(newWord, definitionsArray) {
       // this.wordArray = word.split('');
+      this.word = newWord
+      this.definitions = definitionsArray
       this.guess = [];
       this.guessArchive = [];
       this.round = 1;
@@ -16,7 +19,18 @@ const startNewGame = async (letterCount = 5) => {
       this.keysPlayed = {};
       this.isWon = false;
       this.isLose = false;
+      // this.#setWord(word)
     }
+
+    // set #setWord (word) {
+    //   this.#word = word
+    //   console.log(this.#word)
+    // }
+
+    // get #getWord() {
+    //   return this.#word
+    // }
+
 
     async submitGuess(submission, element) {
       const isWord = await fetchIsWord(submission.join(''));
@@ -82,7 +96,7 @@ const startNewGame = async (letterCount = 5) => {
       }, 250);
     }
   }
-  return new NewGame(gotWord);
+  return new NewGame(word, definitions);
 };
 
 export default startNewGame;

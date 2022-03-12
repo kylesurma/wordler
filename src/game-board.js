@@ -1,5 +1,6 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css, nothing } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
+import { classMap } from 'lit/directives/class-map.js';
 
 class GameBoard extends LitElement {
   static styles = css`
@@ -42,24 +43,72 @@ class GameBoard extends LitElement {
     .letter-box.match {
       background-color: rgba(20, 204, 96, 0.8);
     }
+
+    .not-word {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translateX(-50%) translateY(-50%);
+      background-color: #fff;
+      width: 80%;
+      height: 80%;
+      box-shadow: 1px 0px 5px 2px rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+
+    .not-word > p {
+      font-family: monospace;
+      position: relative;
+      bottom: 2px;
+      font-size: 16px;
+    }
+
+    .hidden {
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0s 0.25s, opacity 0.25s linear;
+    }
+
+    .visible {
+      visibility: visible;
+      opacity: 1;
+      transition: opacity 0.25s linear;
+    }
+
   `;
 
   static properties = {
     guesses: { type: Array },
     currentGuess: { type: Array, state: true },
-    round: { type: Number, state: true },
-    rows: { type: Array, state: true },
+    isNotWord: { type: Boolean },
+    currentGuessStr: { type: String },
   };
 
   constructor() {
     super();
     this.guesses = [];
     this.currentGuess = [];
+    this.currentGuessStr = '';
     this.rows = new Array(6);
     this.column = new Array(5);
   }
 
+  willUpdate(changedProps) {
+    if (changedProps.has('isNotWord')) {
+      if (this.isNotWord) {
+        setTimeout(() => {
+          this.isNotWord = false;
+        }, 1000);
+      }
+    }
+  }
+
   render() {
+    const notWordClasses = {
+      hidden: !this.isNotWord,
+      visible: this.isNotWord,
+    };
+
     return html`
       <div class="game-board-container">
         ${repeat(
@@ -73,8 +122,8 @@ class GameBoard extends LitElement {
                     (d, i) => i,
                     (letter, j) => html` <span
                       class="letter-box
-                      guess-achive
-                      ${this.guesses[idx].guessedLetterStatus[j]}"
+                    guess-achive
+                    ${this.guesses[idx].guessedLetterStatus[j]}"
                       >${letter.toUpperCase()}</span
                     >`
                   )
@@ -84,6 +133,13 @@ class GameBoard extends LitElement {
                     (_, j) => {
                       const isCurRow = idx === this.guesses.length;
                       return html`
+                        ${isCurRow && j === 0
+                          ? html`<div
+                              class="not-word ${classMap(notWordClasses)}"
+                            >
+                              <p>"${this.currentGuessStr}" is not a word</p>
+                            </div>`
+                          : nothing}
                         <span class="letter-box"
                           >${isCurRow && this.currentGuess[j]
                             ? this.currentGuess[j].toUpperCase()
@@ -98,15 +154,6 @@ class GameBoard extends LitElement {
       </div>
     `;
   }
- async animate(letter) {
-   
- const delay = (time) => new Promise(resolve => setTimeout(resolve, time))
-
-const finished =  await delay(1000)
-
- }
- 
-
 }
 
 customElements.define('game-board', GameBoard);

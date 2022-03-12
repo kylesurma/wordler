@@ -11,3 +11,15 @@ export const currentMenuDisplay = statusObj => {
         if (currentStatus) return status
     }
 }
+
+export const initGame = {
+    word: '',
+    definitions: [],
+    guess: [],
+    guessArchive: [],
+    round: 1,
+    finalRound: 6,
+    keysPlayed: {},
+    isWon: false,
+    isLose: false,
+}
