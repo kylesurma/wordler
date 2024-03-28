@@ -1,6 +1,5 @@
 ##
-A wordle clone using Lit and rapid Api dictionary
-## Open-wc Starter App
+A wordle clone using Lit and [WordApi](https://rapidapi.com/dpventures/api/wordsapi). Built as a PWA that allows for infinite play
 
 [![Built with open-wc recommendations](https://img.shields.io/badge/built%20with-open--wc-blue.svg)](https://github.com/open-wc)
 
