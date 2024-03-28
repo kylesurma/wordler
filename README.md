@@ -1,3 +1,5 @@
+##
+A wordle clone using Lit and rapid Api dictionary
 ## Open-wc Starter App
 
 [![Built with open-wc recommendations](https://img.shields.io/badge/built%20with-open--wc-blue.svg)](https://github.com/open-wc)
